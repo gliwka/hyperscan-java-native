@@ -17,7 +17,7 @@ jobs:
           install: base-devel gcc
           path-type: inherit
       - name: Cache native binaries
-        id: cache-primes
+        id: cache
         uses: actions/cache@v2
         with:
           path: |
@@ -25,6 +25,7 @@ jobs:
             target/include
           key: ${{ runner.os }}-${{ runner.os }}-${{ hashFiles('build.sh') }}
       - name: Build native binaries
+        if: steps.cache.outputs.cache-hit != 'true'
         shell: cmd
         env:
           OS_ARCH: windows-x86_64
