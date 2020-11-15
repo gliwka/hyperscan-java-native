@@ -16,6 +16,14 @@ jobs:
         with:
           install: base-devel gcc
           path-type: inherit
+      - name: Cache native binaries
+        id: cache-primes
+        uses: actions/cache@v2
+        with:
+          path: |
+            target/lib
+            target/include
+          key: ${{ runner.os }}-${{ runner.os }}-${{ hashFiles('build.sh') }}
       - name: Build native binaries
         shell: cmd
         env:
