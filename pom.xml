@@ -13,6 +13,13 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <javacpp.version>1.5.4</javacpp.version>
     </properties>
+    <distributionManagement>
+        <snapshotRepository>
+            <id>github</id>
+            <name>GitHub Packages</name>
+            <url>https://maven.pkg.github.com/gliwka/hyperscan-java-native</url>
+        </snapshotRepository>
+    </distributionManagement>
     <build>
         <extensions>
             <extension>
