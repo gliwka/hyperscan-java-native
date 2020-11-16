@@ -31,6 +31,9 @@ jobs:
           install: base-devel gcc
           path-type: inherit
       - uses: ilammy/msvc-dev-cmd@v1
+      - name: Install coreutils for macOS
+        if: matrix.os == 'macos-latest'
+        run: brew install coreutils
       - name: Cache native binaries
         id: cache
         uses: actions/cache@v2
@@ -38,7 +41,7 @@ jobs:
           path: |
             target/lib
             target/include
-          key: ${{ runner.os }}-${{ runner.os }}-${{ hashFiles('build.sh') }}
+          key: ${{ matrix.os }}-${{ matrix.arch }}-${{ hashFiles('build.sh') }}
       - name: Build native binaries
         if: steps.cache.outputs.cache-hit != 'true'
         run: bash build.sh
