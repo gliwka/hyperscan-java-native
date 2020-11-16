@@ -6,7 +6,7 @@ set -o pipefail
 
 HYPERSCAN=5.3.0
 
-THREADS=$(getconf _NPROCESSORS_ONLN)
+THREADS=$(nproc --all)
 
 mkdir -p target/lib
 mkdir -p target/include/hs
