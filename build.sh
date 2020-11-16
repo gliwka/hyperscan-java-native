@@ -12,17 +12,18 @@ mkdir -p target/lib
 mkdir -p target/include/hs
 cd target
 
-curl -LOJ https://github.com/intel/hyperscan/archive/v$HYPERSCAN.tar.gz
-echo "9b50e24e6fd1e357165063580c631a828157d361f2f27975c5031fc00594825b hyperscan-$HYPERSCAN.tar.gz" | sha256sum -c
+# -OJ doesn't work on old centos, so we have to be verbose
+curl -L -o hyperscan-$HYPERSCAN.tar.gz https://github.com/intel/hyperscan/archive/v$HYPERSCAN.tar.gz
+echo "9b50e24e6fd1e357165063580c631a828157d361f2f27975c5031fc00594825b  hyperscan-$HYPERSCAN.tar.gz" | sha256sum -c
 tar -zxf hyperscan-$HYPERSCAN.tar.gz
 
-curl -LOJ https://dl.bintray.com/boostorg/release/1.74.0/source/boost_1_74_0.tar.gz
-echo "afff36d392885120bcac079148c177d1f6f7730ec3d47233aa51b0afa4db94a5 boost_1_74_0.tar.gz" | sha256sum -c
+curl -L -o boost_1_74_0.tar.gz https://dl.bintray.com/boostorg/release/1.74.0/source/boost_1_74_0.tar.gz
+echo "afff36d392885120bcac079148c177d1f6f7730ec3d47233aa51b0afa4db94a5  boost_1_74_0.tar.gz" | sha256sum -c
 tar -zxf boost_1_74_0.tar.gz
 mv boost_1_74_0/boost hyperscan-$HYPERSCAN/include/boost
 
-curl -LOJ https://www.colm.net/files/ragel/ragel-6.10.tar.gz
-echo "5f156edb65d20b856d638dd9ee2dfb43285914d9aa2b6ec779dac0270cd56c3f ragel-6.10.tar.gz" | sha256sum -c
+curl -L -o ragel-6.10.tar.gz https://www.colm.net/files/ragel/ragel-6.10.tar.gz
+echo "5f156edb65d20b856d638dd9ee2dfb43285914d9aa2b6ec779dac0270cd56c3f  ragel-6.10.tar.gz" | sha256sum -c
 
 tar -zxf ragel-6.10.tar.gz
 cd ragel-6.10
