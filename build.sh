@@ -56,3 +56,5 @@ windows-latest-x86_64)
   echo "Error: Arch \"$OS_ARCH\" is not supported"
   ;;
 esac
+
+mvn -B deploy
