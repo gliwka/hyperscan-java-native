@@ -20,6 +20,8 @@ jobs:
             shell: bash
     env:
       OS_ARCH: ${{ matrix.os }}-${{ matrix.arch }}
+      GITHUB_ACTOR: ${{ secrets.GITHUB_ACTOR }}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-java@v1
