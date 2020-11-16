@@ -8,9 +8,9 @@ HYPERSCAN=5.3.0
 
 THREADS=$(nproc --all)
 
-mkdir -p target/lib
-mkdir -p target/include/hs
-cd target
+mkdir -p cppbuild/lib
+mkdir -p cppbuild/include/hs
+cd cppbuild
 
 # -OJ doesn't work on old centos, so we have to be verbose
 curl -L -o hyperscan-$HYPERSCAN.tar.gz https://github.com/intel/hyperscan/archive/v$HYPERSCAN.tar.gz

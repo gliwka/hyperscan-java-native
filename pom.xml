@@ -79,8 +79,8 @@
                 <version>${javacpp.version}</version>
                 <configuration>
                     <classPath>${project.build.outputDirectory}</classPath>
-                    <includePath>${project.build.directory}/include/</includePath>
-                    <linkPath>${project.build.directory}/lib/</linkPath>
+                    <includePath>${project.build.directory}/../cppbuild/include/</includePath>
+                    <linkPath>${project.build.directory}/../cppbuild/lib/</linkPath>
                 </configuration>
                 <executions>
                     <execution>

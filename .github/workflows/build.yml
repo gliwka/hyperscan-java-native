@@ -39,9 +39,9 @@ jobs:
         uses: actions/cache@v2
         with:
           path: |
-            target/lib
-            target/include
-          key: ${{ matrix.os }}-${{ matrix.arch }}-${{ hashFiles('build.sh') }}
+            cppbuild/lib
+            cppbuild/include
+          key: ${{ matrix.os }}-${{ matrix.arch }}-${{ hashFiles('build.sh') }}-cpp
       - name: Build native binaries
         if: steps.cache.outputs.cache-hit != 'true' && matrix.os != 'ubuntu-latest'
         run: bash build.sh
