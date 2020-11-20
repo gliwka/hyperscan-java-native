@@ -57,4 +57,6 @@ windows-latest-x86_64)
   ;;
 esac
 
-mvn -B deploy
+cd ../..
+
+mvn -B --settings mvnsettings.xml deploy
