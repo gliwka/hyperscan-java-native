@@ -45,7 +45,7 @@ import org.bytedeco.javacpp.tools.InfoMapper;
 )
 public class JavaCppPreset implements InfoMapper {
     static {
-        Loader.checkVersion("com.gliwka", "hyperscan");
+        Loader.load();
     }
 
     public void map(InfoMap infoMap) {
