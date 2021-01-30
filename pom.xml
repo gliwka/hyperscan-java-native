@@ -106,7 +106,7 @@
                             <goal>build</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${project.build.directory}/native/com/gliwka/hyperscan/jni/</outputDirectory>
+                            <outputDirectory>${project.build.directory}/native/com/gliwka/hyperscan/jni/${os.detected.classifier}/</outputDirectory>
                             <classOrPackageName>com.gliwka.hyperscan.jni.**</classOrPackageName>
                             <copyLibs>true</copyLibs>
                         </configuration>
