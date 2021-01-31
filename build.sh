@@ -4,7 +4,7 @@
 set -xeu
 set -o pipefail
 
-HYPERSCAN=5.3.0
+HYPERSCAN=5.4.0
 
 THREADS=$(nproc --all)
 
@@ -14,7 +14,7 @@ cd cppbuild
 
 # -OJ doesn't work on old centos, so we have to be verbose
 curl -L -o hyperscan-$HYPERSCAN.tar.gz https://github.com/intel/hyperscan/archive/v$HYPERSCAN.tar.gz
-echo "9b50e24e6fd1e357165063580c631a828157d361f2f27975c5031fc00594825b  hyperscan-$HYPERSCAN.tar.gz" | sha256sum -c
+echo "e51aba39af47e3901062852e5004d127fa7763b5dbbc16bcca4265243ffa106f  hyperscan-$HYPERSCAN.tar.gz" | sha256sum -c
 tar -zxf hyperscan-$HYPERSCAN.tar.gz
 
 curl -L -o boost_1_74_0.tar.gz https://dl.bintray.com/boostorg/release/1.74.0/source/boost_1_74_0.tar.gz
