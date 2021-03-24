@@ -33,9 +33,6 @@ jobs:
           install: base-devel gcc
           path-type: inherit
       - uses: ilammy/msvc-dev-cmd@v1
-      - name: Install coreutils for macOS
-        if: matrix.os == 'macos-latest'
-        run: brew install coreutils
       - name: Build native binaries
         if: steps.cache.outputs.cache-hit != 'true' && matrix.os != 'ubuntu-latest'
         run: bash build.sh
