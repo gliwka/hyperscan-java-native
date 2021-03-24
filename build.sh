@@ -48,18 +48,18 @@ cd ..
 
 cd hyperscan-$HYPERSCAN
 
-case $OS_ARCH in
-ubuntu-latest-x86_64)
+case $DETECTED_PLATFORM in
+linux-x86_64)
   CFLAGS='-O -fPIC' CC="gcc" CXX="g++ -std=c++11 -m64 -fPIC" cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="$(pwd)/.." -DCMAKE_INSTALL_LIBDIR="lib" .
   make -j $THREADS
   make install/strip
   ;;
-macos-latest-x86_64)
+macosx-x86_64)
   cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="$(pwd)/.." -DCMAKE_INSTALL_LIBDIR="lib" -DARCH_OPT_FLAGS='-Wno-error' .
   make -j $THREADS
   make install/strip
   ;;
-windows-latest-x86_64)
+windows-x86_64)
   unset TEMP TMP # temp is defined in uppercase by bash and lowercase by windows, which causes problems with cmake + msbuild
   CXXFLAGS="/Wv:17" cmake -G "Visual Studio 16 2019" -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="$(pwd)/.." -DCMAKE_INSTALL_LIBDIR="lib" -DARCH_OPT_FLAGS='' .
   MSBuild.exe hyperscan.sln //p:Configuration=Release //p:Platform=x64
@@ -67,7 +67,7 @@ windows-latest-x86_64)
   cp lib/*.lib ../lib
   ;;
 *)
-  echo "Error: Arch \"$OS_ARCH\" is not supported"
+  echo "Error: Arch \"$DETECTED_PLATFORM\" is not supported"
   ;;
 esac
 
