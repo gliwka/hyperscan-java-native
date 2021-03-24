@@ -6,6 +6,20 @@ set -o pipefail
 
 HYPERSCAN=5.4.0
 
+detect_platform() {
+  # use os-maven-plugin to detect platform
+  local platform=$(mvn help:evaluate -Dexpression=os.detected.classifier -q -DforceStdout)
+  # fix value for macos: plugin outputs osx, but JavaCPP needs it to be macosx
+  if [[ $platform == osx-* ]]
+  then
+    echo mac$platform
+  else
+    echo $platform
+  fi
+}
+
+export DETECTED_PLATFORM=$(detect_platform)
+
 THREADS=$(nproc --all)
 
 mkdir -p cppbuild/lib
