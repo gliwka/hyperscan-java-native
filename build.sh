@@ -20,7 +20,25 @@ detect_platform() {
 
 export DETECTED_PLATFORM=$(detect_platform)
 
-THREADS=$(nproc --all)
+cross_platform_nproc() {
+  case $DETECTED_PLATFORM in
+    macosx-x86_64) echo $(sysctl -n hw.logicalcpu) ;;
+    linux-x86_64|windows-x86_64) echo $(nproc --all) ;;
+    *) echo Unsupported Platform: $DETECTED_PLATFORM >&2 ; exit -1 ;;
+  esac
+}
+
+cross_platform_check_sha() {
+  local sha=$1
+  local file=$2
+  case $DETECTED_PLATFORM in
+    macosx-x86_64) echo "$sha  $file" | shasum -a 256 -c ;;
+    linux-x86_64|windows-x86_64) echo "$sha  $file" | sha256sum -c ;;
+    *) echo Unsupported Platform: $DETECTED_PLATFORM >&2 ; exit -1 ;;
+  esac
+}
+
+THREADS=$(cross_platform_nproc)
 
 mkdir -p cppbuild/lib
 mkdir -p cppbuild/include/hs
@@ -28,16 +46,22 @@ cd cppbuild
 
 # -OJ doesn't work on old centos, so we have to be verbose
 curl -L -o hyperscan-$HYPERSCAN.tar.gz https://github.com/intel/hyperscan/archive/v$HYPERSCAN.tar.gz
-echo "e51aba39af47e3901062852e5004d127fa7763b5dbbc16bcca4265243ffa106f  hyperscan-$HYPERSCAN.tar.gz" | sha256sum -c
+cross_platform_check_sha \
+  e51aba39af47e3901062852e5004d127fa7763b5dbbc16bcca4265243ffa106f \
+  hyperscan-$HYPERSCAN.tar.gz
 tar -zxf hyperscan-$HYPERSCAN.tar.gz
 
 curl -L -o boost_1_74_0.tar.gz https://dl.bintray.com/boostorg/release/1.74.0/source/boost_1_74_0.tar.gz
-echo "afff36d392885120bcac079148c177d1f6f7730ec3d47233aa51b0afa4db94a5  boost_1_74_0.tar.gz" | sha256sum -c
+cross_platform_check_sha \
+  afff36d392885120bcac079148c177d1f6f7730ec3d47233aa51b0afa4db94a5 \
+  boost_1_74_0.tar.gz
 tar -zxf boost_1_74_0.tar.gz
 mv boost_1_74_0/boost hyperscan-$HYPERSCAN/include/boost
 
 curl -L -o ragel-6.10.tar.gz https://www.colm.net/files/ragel/ragel-6.10.tar.gz
-echo "5f156edb65d20b856d638dd9ee2dfb43285914d9aa2b6ec779dac0270cd56c3f  ragel-6.10.tar.gz" | sha256sum -c
+cross_platform_check_sha \
+  5f156edb65d20b856d638dd9ee2dfb43285914d9aa2b6ec779dac0270cd56c3f \
+  ragel-6.10.tar.gz
 
 tar -zxf ragel-6.10.tar.gz
 cd ragel-6.10
