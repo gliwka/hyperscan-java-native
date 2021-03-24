@@ -106,7 +106,7 @@
                             <goal>build</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${project.build.directory}/native/com/gliwka/hyperscan/jni/${os.detected.classifier}/</outputDirectory>
+                          <outputDirectory>${project.build.directory}/native/com/gliwka/hyperscan/jni/${env.DETECTED_PLATFORM}/</outputDirectory>
                             <classOrPackageName>com.gliwka.hyperscan.jni.**</classOrPackageName>
                             <copyLibs>true</copyLibs>
                         </configuration>
@@ -144,7 +144,7 @@
                             <goal>jar</goal>
                         </goals>
                         <configuration>
-                            <classifier>${os.detected.classifier}</classifier>
+                          <classifier>${env.DETECTED_PLATFORM}</classifier>
                             <skipIfEmpty>true</skipIfEmpty>
                             <archive>
                                 <manifestEntries>
