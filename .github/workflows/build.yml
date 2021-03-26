@@ -41,3 +41,6 @@ jobs:
         uses: docker://ghcr.io/gliwka/centos6-devtoolset7:main
         with:
           args: build.sh
+      - name: Deploy to maven repository
+        if: github.ref == 'refs/heads/main'
+        run: mvn -B --settings mvnsettings.xml deploy

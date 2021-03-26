@@ -97,4 +97,4 @@ esac
 
 cd ../..
 
-mvn -B --settings mvnsettings.xml deploy
+mvn -B install
