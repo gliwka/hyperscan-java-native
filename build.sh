@@ -41,6 +41,7 @@ cross_platform_check_sha() {
 THREADS=$(cross_platform_nproc)
 
 mkdir -p cppbuild/lib
+mkdir -p cppbuild/bin
 mkdir -p cppbuild/include/hs
 cd cppbuild
 
@@ -65,7 +66,7 @@ cross_platform_check_sha \
 
 tar -zxf ragel-6.10.tar.gz
 cd ragel-6.10
-./configure
+./configure --prefix="$(pwd)/.."
 make -j $THREADS
 make install
 cd ..
