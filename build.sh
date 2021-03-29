@@ -98,4 +98,10 @@ esac
 
 cd ../..
 
-mvn -B install
+# only deploy with deploy command line param on master with clean working area
+if [ $# -gt 0 ] && [ $1 = "deploy" ] && [ "$(git symbolic-ref HEAD)" = "refs/heads/main" ] && [ -z "$(git status --porcelain)" ]
+then
+  mvn -B --settings mvnsettings.xml deploy
+else
+  mvn -B install
+fi

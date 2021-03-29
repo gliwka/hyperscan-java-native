@@ -19,12 +19,10 @@ jobs:
           - os: ubuntu-latest
             shell: bash
     env:
-      OS_ARCH: ${{ matrix.os }}-${{ matrix.arch }}
       GITHUB_ACTOR: ${{ secrets.GITHUB_ACTOR }}
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       OSSRH_JIRA_USERNAME: ${{ secrets.OSSRH_JIRA_USERNAME }}
       OSSRH_JIRA_PASSWORD: ${{ secrets.OSSRH_JIRA_PASSWORD }}
-
     steps:
       - uses: actions/checkout@v2
       - uses: msys2/setup-msys2@v2
@@ -35,12 +33,9 @@ jobs:
       - uses: ilammy/msvc-dev-cmd@v1
       - name: Build native binaries
         if: steps.cache.outputs.cache-hit != 'true' && matrix.os != 'ubuntu-latest'
-        run: bash build.sh
+        run: bash build.sh deploy
       - name: Build native binaries in centos container
         if: steps.cache.outputs.cache-hit != 'true' && matrix.os == 'ubuntu-latest'
         uses: docker://ghcr.io/gliwka/centos6-devtoolset7:main
         with:
-          args: build.sh
-      - name: Deploy to maven repository
-        if: github.ref == 'refs/heads/main'
-        run: mvn -B --settings mvnsettings.xml deploy
+          args: build.sh deploy
