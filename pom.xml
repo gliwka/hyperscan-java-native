@@ -207,6 +207,7 @@
                     <header>hyperscan-java-native, ${project.version}</header>
                     <footer>hyperscan-java-native, ${project.version}</footer>
                     <doctitle>hyperscan-java-native, ${project.version}</doctitle>
+                    <doclint>none</doclint>
                 </configuration>
                 <executions>
                     <execution>
