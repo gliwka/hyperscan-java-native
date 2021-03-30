@@ -23,6 +23,8 @@ jobs:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       OSSRH_JIRA_USERNAME: ${{ secrets.OSSRH_JIRA_USERNAME }}
       OSSRH_JIRA_PASSWORD: ${{ secrets.OSSRH_JIRA_PASSWORD }}
+      SIGN_KEY: ${{ secrets.SIGN_KEY }}
+      SIGN_KEY_PASS: ${{ secrets.SIGN_KEY_PASS }}
     steps:
       - uses: actions/checkout@v2
       - uses: msys2/setup-msys2@v2
