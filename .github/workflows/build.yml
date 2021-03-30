@@ -1,8 +1,20 @@
 name: build
 on: [push, pull_request]
+env:
+  OSSRH_JIRA_PASSWORD: ${{ secrets.OSSRH_JIRA_PASSWORD }}
 jobs:
+  create-staging-repo:
+    name: Create staging repository
+    runs-on: ubuntu-latest
+    outputs:
+      staging-repo: ${{ steps.create-repo.outputs.repo }}
+    steps:
+    - uses: actions/checkout@v2
+    - id: create-repo
+      run: "mvn -B --settings mvnsettings.xml nexus-staging:rc-open -DserverId=ossrh -DnexusUrl=https://oss.sonatype.org/ -DstagingProfileId=72c1cc10566951 -DopenedRepositoryMessageFormat='\n::set-output name=repo::%s'"
   build-native:
     name: Build native libs
+    needs: create-staging-repo
     runs-on: ${{ matrix.os }}
     defaults:
       run:
@@ -19,12 +31,9 @@ jobs:
           - os: ubuntu-latest
             shell: bash
     env:
-      GITHUB_ACTOR: ${{ secrets.GITHUB_ACTOR }}
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      OSSRH_JIRA_USERNAME: ${{ secrets.OSSRH_JIRA_USERNAME }}
-      OSSRH_JIRA_PASSWORD: ${{ secrets.OSSRH_JIRA_PASSWORD }}
       SIGN_KEY: ${{ secrets.SIGN_KEY }}
       SIGN_KEY_PASS: ${{ secrets.SIGN_KEY_PASS }}
+      STAGING_REPO: ${{ needs.create-staging-repo.outputs.staging-repo }}
     steps:
       - uses: actions/checkout@v2
       - uses: msys2/setup-msys2@v2
