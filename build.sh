@@ -5,24 +5,22 @@ set -xeu
 set -o pipefail
 
 HYPERSCAN=5.4.0
+VECTORSCAN=af8c6d375cba32a50a9e575de83807d96a0fb503
 
 detect_platform() {
   # use os-maven-plugin to detect platform
   local platform=$(mvn help:evaluate -Dexpression=os.detected.classifier -q -DforceStdout)
-  # fix value for macos: plugin outputs osx, but JavaCPP needs it to be macosx
-  if [[ $platform == osx-* ]]
-  then
-    echo mac$platform
-  else
-    echo $platform
-  fi
+  # fix value for macosx: plugin outputs osx, but JavaCPP needs it to be macosx
+  local fixOsName=${platform/osx/macosx}
+  # fix value for arm64: plugin outputs aarch64, but JavaCPP needs it to be arm64
+  echo ${fixOsName/aarch_64/arm64}
 }
 
-export DETECTED_PLATFORM=$(detect_platform)
+export DETECTED_PLATFORM=${DETECTED_PLATFORM:-$(detect_platform)}
 
 cross_platform_nproc() {
   case $DETECTED_PLATFORM in
-    macosx-x86_64) echo $(sysctl -n hw.logicalcpu) ;;
+    macosx-x86_64|macosx-arm64) echo $(sysctl -n hw.logicalcpu) ;;
     linux-x86_64|windows-x86_64) echo $(nproc --all) ;;
     *) echo Unsupported Platform: $DETECTED_PLATFORM >&2 ; exit -1 ;;
   esac
@@ -32,7 +30,7 @@ cross_platform_check_sha() {
   local sha=$1
   local file=$2
   case $DETECTED_PLATFORM in
-    macosx-x86_64) echo "$sha  $file" | shasum -a 256 -c ;;
+    macosx-x86_64|macosx-arm64) echo "$sha  $file" | shasum -a 256 -c ;;
     linux-x86_64|windows-x86_64) echo "$sha  $file" | sha256sum -c ;;
     *) echo Unsupported Platform: $DETECTED_PLATFORM >&2 ; exit -1 ;;
   esac
@@ -45,12 +43,22 @@ mkdir -p cppbuild/bin
 mkdir -p cppbuild/include/hs
 cd cppbuild
 
-# -OJ doesn't work on old centos, so we have to be verbose
-curl -L -o hyperscan-$HYPERSCAN.tar.gz https://github.com/intel/hyperscan/archive/v$HYPERSCAN.tar.gz
-cross_platform_check_sha \
-  e51aba39af47e3901062852e5004d127fa7763b5dbbc16bcca4265243ffa106f \
-  hyperscan-$HYPERSCAN.tar.gz
-tar -zxf hyperscan-$HYPERSCAN.tar.gz
+# use own vectorscan fork with clang patches for apple silicon macs
+if [ $DETECTED_PLATFORM = "macosx-arm64" ]
+then
+  curl -L -o vectorscan-$VECTORSCAN.zip https://github.com/gliwka/vectorscan/archive/$VECTORSCAN.zip
+  cross_platform_check_sha \
+    5ba9b3766b92371324a83fc2fc47d5005bbed49bc6ba601e2e3ca679d74a150e \
+    vectorscan-$VECTORSCAN.zip
+  unzip vectorscan-$VECTORSCAN.zip
+  mv vectorscan-$VECTORSCAN hyperscan-$HYPERSCAN
+else
+ curl -L -o hyperscan-$HYPERSCAN.tar.gz https://github.com/intel/hyperscan/archive/v$HYPERSCAN.tar.gz
+  cross_platform_check_sha \
+    e51aba39af47e3901062852e5004d127fa7763b5dbbc16bcca4265243ffa106f \
+    hyperscan-$HYPERSCAN.tar.gz
+  tar -zxf hyperscan-$HYPERSCAN.tar.gz
+fi
 
 curl -L -o boost_1_74_0.tar.gz https://dl.bintray.com/boostorg/release/1.74.0/source/boost_1_74_0.tar.gz
 cross_platform_check_sha \
@@ -81,6 +89,11 @@ linux-x86_64)
   ;;
 macosx-x86_64)
   cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="$(pwd)/.." -DCMAKE_INSTALL_LIBDIR="lib" -DARCH_OPT_FLAGS='-Wno-error' .
+  make -j $THREADS
+  make install/strip
+  ;;
+macosx-arm64)
+  CFLAGS="-target arm64-apple-macos11" cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="$(pwd)/.." -DCMAKE_INSTALL_LIBDIR="lib" -DARCH_OPT_FLAGS='-Wno-error' .
   make -j $THREADS
   make install/strip
   ;;

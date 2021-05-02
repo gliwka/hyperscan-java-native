@@ -26,14 +26,21 @@ jobs:
         include:
           - os: windows-latest
             shell: msys2 {0}
+            platform: windows-x86_64
           - os: macos-latest
             shell: bash
+            platform: macosx-x86_64
+          - os: macos-latest
+            shell: bash
+            platform: macosx-arm64
           - os: ubuntu-latest
             shell: bash
+            platform: linux-x86_64
     env:
       SIGN_KEY: ${{ secrets.SIGN_KEY }}
       SIGN_KEY_PASS: ${{ secrets.SIGN_KEY_PASS }}
       STAGING_REPO: ${{ needs.create-staging-repo.outputs.staging-repo }}
+      DETECTED_PLATFORM: ${{ matrix.platform }}
     steps:
       - uses: actions/checkout@v2
       - uses: msys2/setup-msys2@v2
