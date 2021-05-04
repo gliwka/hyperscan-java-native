@@ -21,8 +21,6 @@ jobs:
         shell: ${{ matrix.shell }}
     strategy:
       matrix:
-        os: [macos-latest, windows-latest, ubuntu-latest]
-        arch: [x86_64]
         include:
           - os: windows-latest
             shell: msys2 {0}
