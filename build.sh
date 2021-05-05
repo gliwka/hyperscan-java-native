@@ -93,7 +93,7 @@ macosx-x86_64)
   make install/strip
   ;;
 macosx-arm64)
-  CFLAGS="-target arm64-apple-macos11" cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="$(pwd)/.." -DCMAKE_INSTALL_LIBDIR="lib" -DARCH_OPT_FLAGS='-Wno-error' .
+  CFLAGS="-target arm64-apple-macos11" CXXFLAGS="-target arm64-apple-macos11" cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="$(pwd)/.." -DCMAKE_INSTALL_LIBDIR="lib" -DARCH_OPT_FLAGS='-Wno-error' .
   make -j $THREADS
   make install/strip
   ;;
