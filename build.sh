@@ -84,17 +84,17 @@ cd hyperscan-$HYPERSCAN
 case $DETECTED_PLATFORM in
 linux-x86_64)
   CFLAGS='-O -fPIC' CC="gcc" CXX="g++ -std=c++11 -m64 -fPIC" cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="$(pwd)/.." -DCMAKE_INSTALL_LIBDIR="lib" .
-  make -j $THREADS
+  make -j $THREADS hs hs_runtime hs_compile
   make install/strip
   ;;
 macosx-x86_64)
   cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="$(pwd)/.." -DCMAKE_INSTALL_LIBDIR="lib" -DARCH_OPT_FLAGS='-Wno-error' .
-  make -j $THREADS
+  make -j $THREADS hs hs_runtime hs_compile
   make install/strip
   ;;
 macosx-arm64)
-  CFLAGS="-target arm64-apple-macos11" cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="$(pwd)/.." -DCMAKE_INSTALL_LIBDIR="lib" -DARCH_OPT_FLAGS='-Wno-error' .
-  make -j $THREADS
+  CFLAGS="-target arm64-apple-macos11" CXXFLAGS="-target arm64-apple-macos11" cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="$(pwd)/.." -DCMAKE_INSTALL_LIBDIR="lib" -DARCH_OPT_FLAGS='-Wno-error' .
+  make -j $THREADS hs hs_runtime hs_compile
   make install/strip
   ;;
 windows-x86_64)

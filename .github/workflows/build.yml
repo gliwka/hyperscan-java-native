@@ -21,8 +21,6 @@ jobs:
         shell: ${{ matrix.shell }}
     strategy:
       matrix:
-        os: [macos-latest, windows-latest, ubuntu-latest]
-        arch: [x86_64]
         include:
           - os: windows-latest
             shell: msys2 {0}
@@ -41,6 +39,7 @@ jobs:
       SIGN_KEY_PASS: ${{ secrets.SIGN_KEY_PASS }}
       STAGING_REPO: ${{ needs.create-staging-repo.outputs.staging-repo }}
       DETECTED_PLATFORM: ${{ matrix.platform }}
+      SDKROOT: /Library/Developer/CommandLineTools/SDKs/MacOSX11.1.sdk
     steps:
       - uses: actions/checkout@v2
       - uses: msys2/setup-msys2@v2
@@ -49,11 +48,12 @@ jobs:
           install: base-devel gcc
           path-type: inherit
       - uses: ilammy/msvc-dev-cmd@v1
+      - name: Switch XCode-Version
+        if: matrix.os == 'macos-latest'
+        run: sudo xcode-select -switch /Applications/Xcode_12.2.app
       - name: Build native binaries
-        if: steps.cache.outputs.cache-hit != 'true' && matrix.os != 'ubuntu-latest'
         run: bash build.sh deploy
       - name: Build native binaries in centos container
-        if: steps.cache.outputs.cache-hit != 'true' && matrix.os == 'ubuntu-latest'
         uses: docker://ghcr.io/gliwka/centos6-devtoolset7:main
         with:
           args: build.sh deploy
