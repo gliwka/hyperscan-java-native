@@ -39,6 +39,7 @@ jobs:
       SIGN_KEY_PASS: ${{ secrets.SIGN_KEY_PASS }}
       STAGING_REPO: ${{ needs.create-staging-repo.outputs.staging-repo }}
       DETECTED_PLATFORM: ${{ matrix.platform }}
+      SDKROOT: /Library/Developer/CommandLineTools/SDKs/MacOSX11.1.sdk
     steps:
       - uses: actions/checkout@v2
       - uses: msys2/setup-msys2@v2
