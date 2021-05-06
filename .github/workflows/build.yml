@@ -57,7 +57,9 @@ jobs:
         run: sudo xcode-select -switch /Applications/Xcode_12.2.app
       - name: Build native binaries
         run: bash build.sh deploy
+        if: matrix.os != 'ubuntu-latest'
       - name: Build native binaries in centos container
+        if: matrix.os == 'ubuntu-latest'
         uses: docker://ghcr.io/gliwka/centos6-devtoolset7:main
         with:
           args: build.sh deploy
