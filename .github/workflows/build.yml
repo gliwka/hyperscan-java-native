@@ -4,6 +4,8 @@ env:
   OSSRH_JIRA_PASSWORD: ${{ secrets.OSSRH_JIRA_PASSWORD }}
 jobs:
   create-staging-repo:
+    env:
+      STAGING: true
     name: Create staging repository
     runs-on: ubuntu-latest
     outputs:
@@ -11,6 +13,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - id: create-repo
+      if: startsWith(github.ref, 'refs/tags/v') == true
       run: "mvn -B --settings mvnsettings.xml nexus-staging:rc-open -DserverId=ossrh -DnexusUrl=https://oss.sonatype.org/ -DstagingProfileId=72c1cc10566951 -DopenedRepositoryMessageFormat='\n::set-output name=repo::%s'"
   build-native:
     name: Build native libs
@@ -40,6 +43,7 @@ jobs:
       STAGING_REPO: ${{ needs.create-staging-repo.outputs.staging-repo }}
       DETECTED_PLATFORM: ${{ matrix.platform }}
       SDKROOT: /Library/Developer/CommandLineTools/SDKs/MacOSX11.1.sdk
+      STAGING: ${{ startsWith(github.ref, 'refs/tags/v') }}
     steps:
       - uses: actions/checkout@v2
       - uses: msys2/setup-msys2@v2
