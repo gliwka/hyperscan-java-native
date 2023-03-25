@@ -4,8 +4,7 @@
 set -xeu
 set -o pipefail
 
-HYPERSCAN=5.4.0
-VECTORSCAN=af8c6d375cba32a50a9e575de83807d96a0fb503
+VECTORSCAN=5.4.9
 
 detect_platform() {
   # use os-maven-plugin to detect platform
@@ -43,29 +42,18 @@ mkdir -p cppbuild/bin
 mkdir -p cppbuild/include/hs
 cd cppbuild
 
-# use own vectorscan fork with clang patches for apple silicon macs
-if [ $DETECTED_PLATFORM = "macosx-arm64" ]
-then
-  curl -L -o vectorscan-$VECTORSCAN.zip https://github.com/gliwka/vectorscan/archive/$VECTORSCAN.zip
-  cross_platform_check_sha \
-    5ba9b3766b92371324a83fc2fc47d5005bbed49bc6ba601e2e3ca679d74a150e \
-    vectorscan-$VECTORSCAN.zip
-  unzip vectorscan-$VECTORSCAN.zip
-  mv vectorscan-$VECTORSCAN hyperscan-$HYPERSCAN
-else
- curl -L -o hyperscan-$HYPERSCAN.tar.gz https://github.com/intel/hyperscan/archive/v$HYPERSCAN.tar.gz
-  cross_platform_check_sha \
-    e51aba39af47e3901062852e5004d127fa7763b5dbbc16bcca4265243ffa106f \
-    hyperscan-$HYPERSCAN.tar.gz
-  tar -zxf hyperscan-$HYPERSCAN.tar.gz
-fi
+curl -L -o vectorscan-$VECTORSCAN.tar.gz https://github.com/VectorCamp/vectorscan/archive/refs/tags/vectorscan/$VECTORSCAN.tar.gz
+cross_platform_check_sha \
+  e61c78f26a9d04ccffab0df1159885c4503fc501172402c57f7357a2126ea3c6 \
+  vectorscan-$VECTORSCAN.tar.gz
+tar -zxf vectorscan-$VECTORSCAN.tar.gz
 
 curl -L -o boost_1_74_0.tar.gz https://boostorg.jfrog.io/artifactory/main/release/1.74.0/source/boost_1_74_0.tar.gz
 cross_platform_check_sha \
   afff36d392885120bcac079148c177d1f6f7730ec3d47233aa51b0afa4db94a5 \
   boost_1_74_0.tar.gz
 tar -zxf boost_1_74_0.tar.gz
-mv boost_1_74_0/boost hyperscan-$HYPERSCAN/include/boost
+mv boost_1_74_0/boost vectorscan-vectorscan-$VECTORSCAN/include/boost
 
 curl -L -o ragel-6.10.tar.gz https://www.colm.net/files/ragel/ragel-6.10.tar.gz
 cross_platform_check_sha \
@@ -79,7 +67,7 @@ make -j $THREADS
 make install
 cd ..
 
-cd hyperscan-$HYPERSCAN
+cd vectorscan-vectorscan-$VECTORSCAN
 
 case $DETECTED_PLATFORM in
 linux-x86_64)
