@@ -60,6 +60,6 @@ jobs:
         if: matrix.os != 'ubuntu-latest'
       - name: Build native binaries in centos container
         if: matrix.os == 'ubuntu-latest'
-        uses: docker://ghcr.io/gliwka/centos6-devtoolset7:main
+        uses: docker://ghcr.io/gliwka/centos6-devtoolset7-docker:latest@sha256:2a4702eb7a137ceed8772a84a1dbde8e03e11107b10843d8488246a938b0e3ac
         with:
           args: build.sh deploy
