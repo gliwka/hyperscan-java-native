@@ -5,7 +5,6 @@ set -xeu
 set -o pipefail
 
 HYPERSCAN=5.4.2
-# TODO
 VECTORSCAN=af8c6d375cba32a50a9e575de83807d96a0fb503
 
 detect_platform() {
