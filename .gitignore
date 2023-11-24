@@ -34,3 +34,5 @@ cppbuild/
 
 #test artifacts
 db
+
+.DS_Store

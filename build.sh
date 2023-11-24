@@ -4,8 +4,8 @@
 set -xeu
 set -o pipefail
 
-HYPERSCAN=5.4.0
-VECTORSCAN=af8c6d375cba32a50a9e575de83807d96a0fb503
+VERSION="5.4.11"
+SHA256="905f76ad1fa9e4ae0eb28232cac98afdb96c479666202c5a4c27871fb30a2711"
 
 detect_platform() {
   # use os-maven-plugin to detect platform
@@ -21,7 +21,7 @@ export DETECTED_PLATFORM=${DETECTED_PLATFORM:-$(detect_platform)}
 cross_platform_nproc() {
   case $DETECTED_PLATFORM in
     macosx-x86_64|macosx-arm64) echo $(sysctl -n hw.logicalcpu) ;;
-    linux-x86_64|windows-x86_64) echo $(nproc --all) ;;
+    linux-x86_64|linux-arm64) echo $(nproc --all) ;;
     *) echo Unsupported Platform: $DETECTED_PLATFORM >&2 ; exit -1 ;;
   esac
 }
@@ -31,7 +31,7 @@ cross_platform_check_sha() {
   local file=$2
   case $DETECTED_PLATFORM in
     macosx-x86_64|macosx-arm64) echo "$sha  $file" | shasum -a 256 -c ;;
-    linux-x86_64|windows-x86_64) echo "$sha  $file" | sha256sum -c ;;
+    linux-x86_64|linux-arm64) echo "$sha  $file" | sha256sum -c ;;
     *) echo Unsupported Platform: $DETECTED_PLATFORM >&2 ; exit -1 ;;
   esac
 }
@@ -43,29 +43,19 @@ mkdir -p cppbuild/bin
 mkdir -p cppbuild/include/hs
 cd cppbuild
 
-# use own vectorscan fork with clang patches for apple silicon macs
-if [ $DETECTED_PLATFORM = "macosx-arm64" ]
-then
-  curl -L -o vectorscan-$VECTORSCAN.zip https://github.com/gliwka/vectorscan/archive/$VECTORSCAN.zip
-  cross_platform_check_sha \
-    5ba9b3766b92371324a83fc2fc47d5005bbed49bc6ba601e2e3ca679d74a150e \
-    vectorscan-$VECTORSCAN.zip
-  unzip vectorscan-$VECTORSCAN.zip
-  mv vectorscan-$VECTORSCAN hyperscan-$HYPERSCAN
-else
- curl -L -o hyperscan-$HYPERSCAN.tar.gz https://github.com/intel/hyperscan/archive/v$HYPERSCAN.tar.gz
-  cross_platform_check_sha \
-    e51aba39af47e3901062852e5004d127fa7763b5dbbc16bcca4265243ffa106f \
-    hyperscan-$HYPERSCAN.tar.gz
-  tar -zxf hyperscan-$HYPERSCAN.tar.gz
-fi
+curl -L -o vectorscan-$VERSION.tar.gz https://github.com/VectorCamp/vectorscan/archive/refs/tags/vectorscan/5.4.11.tar.gz
+cross_platform_check_sha \
+  $SHA256 \
+  vectorscan-$VERSION.tar.gz
+tar -xvf vectorscan-$VERSION.tar.gz
+mv vectorscan-vectorscan-$VERSION vectorscan
 
 curl -L -o boost_1_74_0.tar.gz https://boostorg.jfrog.io/artifactory/main/release/1.74.0/source/boost_1_74_0.tar.gz
 cross_platform_check_sha \
   afff36d392885120bcac079148c177d1f6f7730ec3d47233aa51b0afa4db94a5 \
   boost_1_74_0.tar.gz
 tar -zxf boost_1_74_0.tar.gz
-mv boost_1_74_0/boost hyperscan-$HYPERSCAN/include/boost
+mv boost_1_74_0/boost vectorscan/include/boost
 
 curl -L -o ragel-6.10.tar.gz https://www.colm.net/files/ragel/ragel-6.10.tar.gz
 cross_platform_check_sha \
@@ -79,30 +69,26 @@ make -j $THREADS
 make install
 cd ..
 
-cd hyperscan-$HYPERSCAN
+cd vectorscan
+
+# Disable flakey sqlite detection - only needed to build auxillary tools anyways.
+> cmake/sqlite3.cmake
 
 case $DETECTED_PLATFORM in
 linux-x86_64)
-  CFLAGS='-O -fPIC' CC="gcc" CXX="g++ -std=c++11 -m64 -fPIC" cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="$(pwd)/.." -DCMAKE_INSTALL_LIBDIR="lib" -DPCRE_SOURCE="." .
-  make -j $THREADS hs hs_runtime hs_compile
+  cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="$(pwd)/.." -DCMAKE_INSTALL_LIBDIR="lib" -DPCRE_SOURCE="." -DFAT_RUNTIME=on -DBUILD_SHARED_LIBS=on -DBUILD_AVX2=yes -DBUILD_AVX512=yes -DBUILD_AVX512VBMI=yes .
+  make -j $THREADS
   make install/strip
   ;;
-macosx-x86_64)
-  cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="$(pwd)/.." -DCMAKE_INSTALL_LIBDIR="lib" -DARCH_OPT_FLAGS='-Wno-error' -DPCRE_SOURCE="." .
-  make -j $THREADS hs hs_runtime hs_compile
+linux-arm64)
+  CC="clang" CXX="clang++" cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="$(pwd)/.." -DCMAKE_INSTALL_LIBDIR="lib" -DPCRE_SOURCE="." -DFAT_RUNTIME=on -DBUILD_SHARED_LIBS=on .
+  make -j $THREADS
   make install/strip
   ;;
-macosx-arm64)
-  CFLAGS="-target arm64-apple-macos11" CXXFLAGS="-target arm64-apple-macos11" cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="$(pwd)/.." -DCMAKE_INSTALL_LIBDIR="lib" -DARCH_OPT_FLAGS='-Wno-error' -DPCRE_SOURCE="." .
-  make -j $THREADS hs hs_runtime hs_compile
+macosx-x86_64|macosx-arm64)
+  cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="$(pwd)/.." -DCMAKE_INSTALL_LIBDIR="lib" -DARCH_OPT_FLAGS='-Wno-error' -DPCRE_SOURCE="." -DBUILD_SHARED_LIBS=on .
+  make -j $THREADS
   make install/strip
-  ;;
-windows-x86_64)
-  unset TEMP TMP # temp is defined in uppercase by bash and lowercase by windows, which causes problems with cmake + msbuild
-  CXXFLAGS="/Wv:17" cmake -G "Visual Studio 16 2019" -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="$(pwd)/.." -DCMAKE_INSTALL_LIBDIR="lib" -DARCH_OPT_FLAGS='' -DPCRE_SOURCE="." .
-  MSBuild.exe hyperscan.sln //p:Configuration=Release //p:Platform=x64
-  cp -r src/* ../include/hs/
-  cp lib/*.lib ../lib
   ;;
 *)
   echo "Error: Arch \"$DETECTED_PLATFORM\" is not supported"
@@ -118,3 +104,4 @@ then
 else
   mvn -B -Dorg.bytedeco.javacpp.platform=$DETECTED_PLATFORM install
 fi
+

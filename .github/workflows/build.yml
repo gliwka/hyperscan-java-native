@@ -18,48 +18,51 @@ jobs:
   build-native:
     name: Build native libs
     needs: create-staging-repo
-    runs-on: ${{ matrix.os }}
+    runs-on: ${{ matrix.runner }}
     defaults:
       run:
         shell: ${{ matrix.shell }}
     strategy:
+      fail-fast: false
       matrix:
         include:
-          - os: windows-latest
-            shell: msys2 {0}
-            platform: windows-x86_64
-          - os: macos-latest
+          - os: macos
+            runner: macos-12
             shell: bash
             platform: macosx-x86_64
-          - os: macos-latest
+          - os: macos
+            runner: macos-12-large
             shell: bash
             platform: macosx-arm64
-          - os: ubuntu-latest
+          - os: linux
+            runner: ubuntu-latest
             shell: bash
             platform: linux-x86_64
+          - os: linux
+            runner: buildjet-4vcpu-ubuntu-2204-arm
+            shell: bash
+            platform: linux-arm64
     env:
-      SIGN_KEY: ${{ secrets.SIGN_KEY }}
-      SIGN_KEY_PASS: ${{ secrets.SIGN_KEY_PASS }}
       STAGING_REPO: ${{ needs.create-staging-repo.outputs.staging-repo }}
       DETECTED_PLATFORM: ${{ matrix.platform }}
-      SDKROOT: /Library/Developer/CommandLineTools/SDKs/MacOSX11.1.sdk
       STAGING: ${{ startsWith(github.ref, 'refs/tags/v') }}
     steps:
       - uses: actions/checkout@v2
-      - uses: msys2/setup-msys2@v2
-        if: matrix.os == 'windows-latest'
-        with:
-          install: base-devel gcc
-          path-type: inherit
       - uses: ilammy/msvc-dev-cmd@v1
-      - name: Switch XCode-Version
-        if: matrix.os == 'macos-latest'
-        run: sudo xcode-select -switch /Applications/Xcode_12.2.app
-      - name: Build native binaries
-        run: bash build.sh deploy
-        if: matrix.os != 'ubuntu-latest'
-      - name: Build native binaries in centos container
-        if: matrix.os == 'ubuntu-latest'
-        uses: docker://ghcr.io/gliwka/centos6-devtoolset7:main
+      - uses: maxim-lobanov/setup-xcode@v1
+        if: matrix.os == 'macos'
         with:
-          args: build.sh deploy
+          xcode-version: latest-stable
+      - name: Set signing keys
+        if: startsWith(github.ref, 'refs/tags/v') == true
+        run: |
+          echo "SIGN_KEY=${{ secrets.SIGN_KEY }}" >> "$GITHUB_ENV"
+          echo "SIGN_KEY_PASS=${{ secrets.SIGN_KEY_PASS }}" >> "$GITHUB_ENV"
+      - name: Build native binaries
+        run: ./build.sh deploy
+        if: matrix.os != 'linux'
+      - name: Build native binaries in centos container
+        if: matrix.os == 'linux'
+        uses: docker://ghcr.io/gliwka/centos7-toolchain:main@sha256:e6cf17223408bb4d1314be547d74b23d04bcf6480d2fe23822fb672a52775f76
+        with:
+          args: ./build.sh deploy
