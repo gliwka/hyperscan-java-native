@@ -13,8 +13,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 class SmokeTest {
     @Test
     void smokeTest() {
-        String[] patterns = { "abc1", "asa", "dab" };
+        assertThat(hs_valid_platform()).isEqualTo(0);
 
+        String[] patterns = { "abc1", "asa", "dab" };
         PointerPointer<BytePointer> expressionsPointer = new PointerPointer<>(patterns);
         IntPointer patternIds = new IntPointer(1, 2, 3);
         IntPointer compileFlags = new IntPointer(HS_FLAG_SOM_LEFTMOST, HS_FLAG_SOM_LEFTMOST, HS_FLAG_SOM_LEFTMOST);
@@ -23,7 +24,7 @@ class SmokeTest {
         PointerPointer<hs_compile_error_t> compile_error_t_p = new PointerPointer<hs_compile_error_t>(1);
 
 
-        int compileResult = hyperscan.hs_compile_multi(expressionsPointer, compileFlags, patternIds, 3, HS_MODE_BLOCK,
+        int compileResult = hs_compile_multi(expressionsPointer, compileFlags, patternIds, 3, HS_MODE_BLOCK,
                     null, database_t_p, compile_error_t_p);
         assertThat(0).isEqualTo(compileResult);
 
@@ -46,7 +47,7 @@ class SmokeTest {
         };
 
         String textToSearch = "-21dasaaadabcaaa";
-        hyperscan.hs_scan(database_t, textToSearch, textToSearch.length(), 0, scratchSpace, matchEventHandler, expressionsPointer);
+        hs_scan(database_t, textToSearch, textToSearch.length(), 0, scratchSpace, matchEventHandler, expressionsPointer);
         assertThat(matches).containsExactly(new long[] {2, 4, 7}, new long[] {3, 9, 12});
     }
 }
