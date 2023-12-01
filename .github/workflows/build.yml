@@ -32,7 +32,7 @@ jobs:
             platform: macosx-x86_64
             jdkArch: x64
           - os: macos
-            runner: macos-12-large
+            runner: macos-13-xlarge
             shell: bash
             platform: macosx-arm64
             jdkArch: aarch64
