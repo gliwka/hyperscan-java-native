@@ -98,8 +98,8 @@ esac
 
 cd ../..
 
-# only deploy with deploy command line param on master with clean working area
-if [ $# -gt 0 ] && [ $1 = "deploy" ] && [ "$(git symbolic-ref HEAD)" = "refs/heads/main" ] && [ -z "$(git status --porcelain)" ]
+# only deploy with deploy command line param
+if [ $# -gt 0 ] && [ $1 = "deploy" ]
 then
   mvn -B -Dorg.bytedeco.javacpp.platform=$DETECTED_PLATFORM --settings mvnsettings.xml deploy
 else
