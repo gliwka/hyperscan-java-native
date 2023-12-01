@@ -27,7 +27,7 @@ jobs:
       matrix:
         include:
           - os: macos
-            runner: macos-12
+            runner: macos-13
             shell: bash
             platform: macosx-x86_64
             jdkArch: x64
