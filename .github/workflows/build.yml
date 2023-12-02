@@ -14,7 +14,7 @@ jobs:
     - uses: actions/checkout@v2
     - id: create-repo
       if: startsWith(github.ref, 'refs/tags/v') == true
-      run: "mvn -B --settings mvnsettings.xml nexus-staging:rc-open -DserverId=ossrh -DnexusUrl=https://oss.sonatype.org/ -DstagingProfileId=72c1cc10566951 -DopenedRepositoryMessageFormat='\n::set-output name=repo::%s'"
+      run: "mvn -B --settings mvnsettings.xml nexus-staging:rc-open -DserverId=ossrh -DnexusUrl=https://oss.sonatype.org/ -DstagingProfileId=72c1cc10566951 -DopenedRepositoryMessageFormat='\nrepo=%s' | grep 'repo=' >> $GITHUB_OUTPUT"
   build-native:
     name: Build native libs
     needs: create-staging-repo
