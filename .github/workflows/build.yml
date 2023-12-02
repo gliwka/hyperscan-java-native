@@ -72,4 +72,4 @@ jobs:
         if: matrix.os == 'linux'
         uses: docker://ghcr.io/gliwka/centos7-toolchain:main@sha256:e6cf17223408bb4d1314be547d74b23d04bcf6480d2fe23822fb672a52775f76
         with:
-          args: ./build.sh deploy
+          args: '"./build.sh deploy"'
