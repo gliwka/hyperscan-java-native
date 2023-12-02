@@ -63,8 +63,10 @@ jobs:
       - name: Set signing keys
         if: startsWith(github.ref, 'refs/tags/v') == true
         run: |
-          echo "SIGN_KEY=${{ secrets.SIGN_KEY }}" >> "$GITHUB_ENV"
-          echo "SIGN_KEY_PASS=${{ secrets.SIGN_KEY_PASS }}" >> "$GITHUB_ENV"
+          echo "SIGN_KEY<<EOF" >> $GITHUB_ENV
+          echo "${{ secrets.SIGN_KEY }}" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+          echo "SIGN_KEY_PASS=${{ secrets.SIGN_KEY_PASS }}" >> $GITHUB_ENV
       - name: Build native binaries
         run: ./build.sh deploy
         if: matrix.os == 'macos'
