@@ -62,6 +62,7 @@ jobs:
             curl
             base-devel
             gcc
+            cmake
       - uses: actions/setup-java@v3
         if: matrix.os == 'macos' || matrix.os == 'windows'
         with:
