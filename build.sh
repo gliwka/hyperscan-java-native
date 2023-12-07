@@ -91,8 +91,8 @@ windows-x86_64)
   cmake -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="$(pwd)/.." -DCMAKE_INSTALL_LIBDIR="lib" -DPCRE_SOURCE="." -DBUILD_SHARED_LIBS=on .
   ls -la
   make -j $THREADS
-  ../bin/unit-hyperscan.exe
   make install/strip
+  ../bin/unit-hyperscan.exe
   ;;
 linux-x86_64)
   cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="$(pwd)/.." -DCMAKE_INSTALL_LIBDIR="lib" -DPCRE_SOURCE="." -DFAT_RUNTIME=on -DBUILD_SHARED_LIBS=on -DBUILD_AVX2=yes -DBUILD_AVX512=yes -DBUILD_AVX512VBMI=yes .
