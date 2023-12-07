@@ -1,8 +1,8 @@
 #!/bin/bash
 
 echo "Path: $PATH"
-echo "Mingw packages:"
-ls /mingw64/bin
+echo "Mingw bins:"
+ls /mingw64/bin -la
 
 # Ensure to exit on all kinds of errors
 set -xeu
