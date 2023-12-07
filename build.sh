@@ -92,6 +92,8 @@ windows-x86_64)
   ls -la
   make -j $THREADS
   make install/strip
+  ls bin
+  ls ../bin
   ../bin/unit-hyperscan.exe
   ;;
 linux-x86_64)
