@@ -61,8 +61,8 @@ jobs:
           install: >-
             curl
             base-devel
-            gcc
-            cmake
+            mingw-w64-x86_64-cmake
+            mingw-w64-gcc
       - uses: actions/setup-java@v3
         if: matrix.os == 'macos' || matrix.os == 'windows'
         with:
