@@ -1,5 +1,7 @@
 #!/bin/bash
 
+echo "Path: $PATH"
+
 # Ensure to exit on all kinds of errors
 set -xeu
 set -o pipefail
