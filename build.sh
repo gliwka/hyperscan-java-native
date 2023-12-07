@@ -86,6 +86,8 @@ cd vectorscan
 
 case $DETECTED_PLATFORM in
 windows-x86_64)
+  # Path missing DLL export first - upstream PR pending
+  echo "  hs_compile_lit_multi" >> hs.def
   cmake -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="$(pwd)/.." -DCMAKE_INSTALL_LIBDIR="lib" -DPCRE_SOURCE="." -DBUILD_SHARED_LIBS=on .
   ls -la
   make -j $THREADS
