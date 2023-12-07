@@ -50,7 +50,7 @@ export PATH=$PATH:$(pwd)/bin
 
 if [ $DETECTED_PLATFORM -eq windows-x86_64 ]
 then
-  ln -s bin/make $(which mingw32-make)
+  ln -s bin/make.exe $(which mingw32-make)
 fi
 
 curl -L -o vectorscan-$VERSION.tar.gz https://github.com/VectorCamp/vectorscan/archive/refs/tags/vectorscan/5.4.11.tar.gz
