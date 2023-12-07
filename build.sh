@@ -48,7 +48,7 @@ mkdir -p cppbuild/include/hs
 cd cppbuild
 export PATH=$PATH:$(pwd)/bin
 
-if [ $DETECTED_PLATFORM -eq windows-x86_64 ]
+if [ "$DETECTED_PLATFORM" = "windows-x86_64" ]
 then
   ln -s bin/make.exe $(which mingw32-make)
 fi
