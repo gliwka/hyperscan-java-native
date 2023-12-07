@@ -42,6 +42,7 @@ mkdir -p cppbuild/lib
 mkdir -p cppbuild/bin
 mkdir -p cppbuild/include/hs
 cd cppbuild
+export PATH=$PATH:$(pwd)/bin
 
 curl -L -o vectorscan-$VERSION.tar.gz https://github.com/VectorCamp/vectorscan/archive/refs/tags/vectorscan/5.4.11.tar.gz
 cross_platform_check_sha \
