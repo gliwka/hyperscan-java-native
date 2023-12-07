@@ -92,6 +92,7 @@ windows-x86_64)
   ls -la
   make -j $THREADS
   make install/strip
+  cp ./bin/libhs.dll ./bin/hs.dll
   ./bin/unit-hyperscan
   ;;
 linux-x86_64)
