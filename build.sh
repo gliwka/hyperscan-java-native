@@ -21,7 +21,7 @@ export DETECTED_PLATFORM=${DETECTED_PLATFORM:-$(detect_platform)}
 cross_platform_nproc() {
   case $DETECTED_PLATFORM in
     macosx-x86_64|macosx-arm64) echo $(sysctl -n hw.logicalcpu) ;;
-    linux-x86_64|linux-arm64) echo $(nproc --all) ;;
+    linux-x86_64|linux-arm64|windows-x86_64) echo $(nproc --all) ;;
     *) echo Unsupported Platform: $DETECTED_PLATFORM >&2 ; exit -1 ;;
   esac
 }
@@ -31,7 +31,7 @@ cross_platform_check_sha() {
   local file=$2
   case $DETECTED_PLATFORM in
     macosx-x86_64|macosx-arm64) echo "$sha  $file" | shasum -a 256 -c ;;
-    linux-x86_64|linux-arm64) echo "$sha  $file" | sha256sum -c ;;
+    linux-x86_64|linux-arm64|windows-x86_64) echo "$sha  $file" | sha256sum -c ;;
     *) echo Unsupported Platform: $DETECTED_PLATFORM >&2 ; exit -1 ;;
   esac
 }
@@ -75,6 +75,11 @@ cd vectorscan
 > cmake/sqlite3.cmake
 
 case $DETECTED_PLATFORM in
+windows-x86_64)
+  cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="$(pwd)/.." -DCMAKE_INSTALL_LIBDIR="lib" -DPCRE_SOURCE="." -DBUILD_SHARED_LIBS=on .
+  make -j $THREADS
+  make install/strip
+  ;;
 linux-x86_64)
   cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="$(pwd)/.." -DCMAKE_INSTALL_LIBDIR="lib" -DPCRE_SOURCE="." -DFAT_RUNTIME=on -DBUILD_SHARED_LIBS=on -DBUILD_AVX2=yes -DBUILD_AVX512=yes -DBUILD_AVX512VBMI=yes .
   make -j $THREADS
