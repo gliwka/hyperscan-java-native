@@ -30,6 +30,14 @@ cross_platform_nproc() {
   esac
 }
 
+cross_platform_make() {
+  case $DETECTED_PLATFORM in
+    macosx-x86_64|macosx-arm64|linux-x86_64|linux-arm64) echo "make" ;;
+    windows-x86_64) echo "mingw32-make" ;;
+    *) echo Unsupported Platform: $DETECTED_PLATFORM >&2 ; exit -1 ;;
+  esac
+}
+
 cross_platform_check_sha() {
   local sha=$1
   local file=$2
@@ -41,6 +49,7 @@ cross_platform_check_sha() {
 }
 
 THREADS=$(cross_platform_nproc)
+MAKE=$(cross_platform_make)
 
 mkdir -p cppbuild/lib
 mkdir -p cppbuild/bin
@@ -70,8 +79,8 @@ cross_platform_check_sha \
 tar -zxf ragel-6.10.tar.gz
 cd ragel-6.10
 ./configure --prefix="$(pwd)/.."
-make -j $THREADS
-make install
+$MAKE -j $THREADS
+$MAKE install
 cd ..
 
 cd vectorscan
@@ -83,24 +92,24 @@ case $DETECTED_PLATFORM in
 windows-x86_64)
   cmake -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="$(pwd)/.." -DCMAKE_INSTALL_LIBDIR="lib" -DPCRE_SOURCE="." -DBUILD_SHARED_LIBS=on .
   ls -la
-  make -j $THREADS
-  make install/strip
+  $MAKE -j $THREADS
+  $MAKE install/strip
   ;;
 linux-x86_64)
   cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="$(pwd)/.." -DCMAKE_INSTALL_LIBDIR="lib" -DPCRE_SOURCE="." -DFAT_RUNTIME=on -DBUILD_SHARED_LIBS=on -DBUILD_AVX2=yes -DBUILD_AVX512=yes -DBUILD_AVX512VBMI=yes .
-  make -j $THREADS
-  make install/strip
+  $MAKE -j $THREADS
+  $MAKE install/strip
   ;;
 linux-arm64)
   CC="clang" CXX="clang++" cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="$(pwd)/.." -DCMAKE_INSTALL_LIBDIR="lib" -DPCRE_SOURCE="." -DFAT_RUNTIME=on -DBUILD_SHARED_LIBS=on .
-  make -j $THREADS
-  make install/strip
+  $MAKE -j $THREADS
+  $MAKE install/strip
   ;;
 macosx-x86_64|macosx-arm64)
   export MACOSX_DEPLOYMENT_TARGET=12
   cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="$(pwd)/.." -DCMAKE_INSTALL_LIBDIR="lib" -DARCH_OPT_FLAGS='-Wno-error' -DPCRE_SOURCE="." -DBUILD_SHARED_LIBS=on .
-  make -j $THREADS
-  make install/strip
+  $MAKE -j $THREADS
+  $MAKE install/strip
   ;;
 *)
   echo "Error: Arch \"$DETECTED_PLATFORM\" is not supported"
