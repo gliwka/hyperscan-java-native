@@ -88,11 +88,10 @@ case $DETECTED_PLATFORM in
 windows-x86_64)
   # Path missing DLL export first - upstream PR pending
   echo "  hs_compile_lit_multi" >> hs.def
-  cmake -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="$(pwd)/.." -DCMAKE_INSTALL_LIBDIR="lib" -DPCRE_SOURCE="." -DBUILD_SHARED_LIBS=on .
+  cmake -G "MinGW Makefiles" -DCMAKE_SHARED_LIBRARY_PREFIX="" -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="$(pwd)/.." -DCMAKE_INSTALL_LIBDIR="lib" -DPCRE_SOURCE="." -DBUILD_SHARED_LIBS=on .
   ls -la
   make -j $THREADS
   make install/strip
-  cp ./bin/libhs.dll ./bin/hs.dll
   ./bin/unit-hyperscan
   ;;
 linux-x86_64)
