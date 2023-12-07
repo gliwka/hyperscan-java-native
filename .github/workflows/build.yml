@@ -54,6 +54,10 @@ jobs:
       DETECTED_PLATFORM: ${{ matrix.platform }}
       STAGING: ${{ startsWith(github.ref, 'refs/tags/v') }}
     steps:
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+        with:
+          detached: true
       - uses: actions/checkout@v2
       - uses: msys2/setup-msys2@v2
         with:
