@@ -60,6 +60,8 @@ jobs:
           update: true
           install: >-
             curl
+            base-devel
+            gcc
       - uses: actions/setup-java@v3
         if: matrix.os == 'macos' || matrix.os == 'windows'
         with:
