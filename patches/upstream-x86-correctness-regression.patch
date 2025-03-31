@@ -1,0 +1,118 @@
+From 4f09e785c0a3d0ce050e9eff8f28af0c82e27620 Mon Sep 17 00:00:00 2001
+From: gtsoul-tech <56584633+gtsoul-tech@users.noreply.github.com>
+Date: Wed, 13 Nov 2024 10:43:23 +0200
+Subject: [PATCH] Fix regression error #317 and add unit test (#318)
+
+Revert the code that produced the regression error in #317
+Add the regression error to a unit test regressions.cpp along with the rebar tests
+
+https://github.com/VectorCamp/vectorscan/commit/4f09e785c0a3d0ce050e9eff8f28af0c82e27620
+
+---------
+
+Co-authored-by: gtsoul-tech <gtsoulkanakis@gmail.com>
+---
+ src/nfa/shufti_simd.hpp                       | 12 +----
+ unit/CMakeLists.txt                           |  2 +-
+ .../{rebar_tests.cpp => regressions.cpp}      | 50 ++++++++++++++++++-
+ 3 files changed, 52 insertions(+), 12 deletions(-)
+ rename unit/hyperscan/{rebar_tests.cpp => regressions.cpp} (83%)
+
+diff --git a/src/nfa/shufti_simd.hpp b/src/nfa/shufti_simd.hpp
+index bdb0ff9fe..1a00b87b9 100644
+--- a/src/nfa/shufti_simd.hpp
++++ b/src/nfa/shufti_simd.hpp
+@@ -244,16 +244,8 @@ const u8 *shuftiDoubleExecReal(m128 mask1_lo, m128 mask1_hi, m128 mask2_lo, m128
+     // finish off tail
+ 
+     if (d != buf_end) {
+-        SuperVector<S> chars = SuperVector<S>::Zeroes();
+-        const u8 *end_buf;
+-        if (buf_end - buf < S) {
+-          memcpy(&chars.u, buf, buf_end - buf);
+-          end_buf = buf;
+-        } else {
+-          chars = SuperVector<S>::loadu(buf_end - S);
+-          end_buf = buf_end - S;
+-        }
+-        rv = fwdBlockDouble(wide_mask1_lo, wide_mask1_hi, wide_mask2_lo, wide_mask2_hi, chars, end_buf);
++        SuperVector<S> chars = SuperVector<S>::loadu(d);
++        rv = fwdBlockDouble(wide_mask1_lo, wide_mask1_hi, wide_mask2_lo, wide_mask2_hi, chars, d);
+         DEBUG_PRINTF("rv %p \n", rv);
+         if (rv && rv < buf_end) return rv;
+     }
+diff --git a/unit/CMakeLists.txt b/unit/CMakeLists.txt
+index 0a118b24e..7e16f3330 100644
+--- a/unit/CMakeLists.txt
++++ b/unit/CMakeLists.txt
+@@ -50,7 +50,7 @@ set(unit_hyperscan_SOURCES
+     hyperscan/main.cpp
+     hyperscan/multi.cpp
+     hyperscan/order.cpp
+-    hyperscan/rebar_tests.cpp
++    hyperscan/regressions.cpp
+     hyperscan/scratch_op.cpp
+     hyperscan/scratch_in_use.cpp
+     hyperscan/serialize.cpp
+diff --git a/unit/hyperscan/rebar_tests.cpp b/unit/hyperscan/regressions.cpp
+similarity index 83%
+rename from unit/hyperscan/rebar_tests.cpp
+rename to unit/hyperscan/regressions.cpp
+index 26e720551..320b0d061 100644
+--- a/unit/hyperscan/rebar_tests.cpp
++++ b/unit/hyperscan/regressions.cpp
+@@ -228,4 +228,52 @@ TEST(rebar, lh3lh3_reb_date_grep) {
+     hs_free_database(db);
+     err = hs_free_scratch(scratch);
+     ASSERT_EQ(HS_SUCCESS, err);
+-}
+\ No newline at end of file
++}
++
++
++const char *patterns[] = {
++    "^muvoy-nyemcynjywynamlahi/nyzye/khjdrehko-(qjhn|lyol)-.*/0$",
++    "^cop/devel/workflows-(prod|test)-.*/[0-9]+$", // Regex pattern that will match our fixture
++    
++};
++
++TEST(bug317, regressionOnx86Bug317) {
++    hs_database_t *database;
++    hs_compile_error_t *compile_err;    
++
++    unsigned ids[2] = {0};
++    ids[0]=0;
++    ids[1]=1;
++    
++    const unsigned flag = HS_FLAG_SINGLEMATCH | HS_FLAG_ALLOWEMPTY | HS_FLAG_UTF8 | HS_FLAG_PREFILTER;
++    std::vector<unsigned> flags;
++    for (size_t i = 0; i < 2; ++i) {
++        flags.push_back(flag);
++    } 
++    hs_error_t err = hs_compile_multi(patterns, flags.data(), ids, 2, HS_MODE_BLOCK, NULL, &database, &compile_err);
++    ASSERT_EQ(HS_SUCCESS, err);
++    ASSERT_TRUE(database != nullptr);
++
++    // Allocate scratch space
++    hs_scratch_t *scratch = NULL;
++    err = hs_alloc_scratch(database, &scratch);
++    ASSERT_EQ(HS_SUCCESS, err);
++    ASSERT_TRUE(scratch != nullptr);
++    // This input should match
++    const char* input = "cop/devel/workflows-prod-build-cop-cop-ingestor/0";
++    
++    // Scan the input
++    bool matchFound = false;
++    auto matchHandler = [](unsigned int, unsigned long long, unsigned long long, unsigned int, void *ctx) -> int {
++        bool *matchFound = static_cast<bool*>(ctx);
++        *matchFound = true;
++        return 0;
++    };
++
++    err= hs_scan(database, input, strlen(input), 0, scratch, matchHandler, reinterpret_cast<void *>(&matchFound));
++    ASSERT_EQ(HS_SUCCESS, err);
++    ASSERT_EQ(true, matchFound);
++    // Clean up
++    hs_free_database(database);
++    err = hs_free_scratch(scratch);
++}
