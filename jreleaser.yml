@@ -1,0 +1,21 @@
+project:
+  languages:
+    java:
+      version: "8"
+      groupId: com.gliwka.hyperscan
+      artifactId: hyperscan-java-native
+deploy:
+  maven:
+    mavenCentral:
+      hyperscan-java-native:
+        active: ALWAYS
+        url: https://central.sonatype.com/api/v1/publisher
+        snapshotSupported: true
+        applyMavenCentralRules: true
+        stagingRepositories:
+          - target/staging-deploy
+        verifyUrl: 'https://repo1.maven.org/maven2/{{path}}/{{filename}}'
+        namespace: com.gliwka
+signing:
+  active: ALWAYS
+  mode: MEMORY

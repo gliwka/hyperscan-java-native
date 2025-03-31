@@ -55,7 +55,9 @@ jobs:
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: build-result-${{ matrix.platform }}
-          path: target/
+          path: |
+            target/*.jar
+            target/*.pom
   publish:
     if: contains(github.ref, 'refs/tags/v')
     needs: build-native
@@ -64,14 +66,13 @@ jobs:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
       - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e
         with:
-          path: target/
+          path: target/staging-deploy
           merge-multiple: true
-      - name: Publish to maven central
+      - uses: jreleaser/release-action@f69e545b05f149483cecb2fb81866247992694b8
+        with:
+          arguments: deploy
         env:
-          CENTRAL_TOKEN_USERNAME: ${{ secrets.CENTRAL_TOKEN_USERNAME }}
-          CENTRAL_TOKEN_PASSWORD: ${{ secrets.CENTRAL_TOKEN_PASSWORD }}
-          SIGN_KEY: ${{ secrets.SIGN_KEY }}
-          SIGN_KEY_PASS: ${{ secrets.SIGN_KEY_PASS }}
-          STAGING: true
-        run: mvn --settings mvnsettings.xml sign:sign central-publishing:publish
-      
+          JRELEASER_MAVENCENTRAL_USERNAME: ${{ secrets.CENTRAL_TOKEN_USERNAME }}
+          JRELEASER_MAVENCENTRAL_PASSWORD: ${{ secrets.CENTRAL_TOKEN_PASSWORD }}
+          JRELEASER_GPG_SECRET_KEY: ${{ secrets.SIGN_KEY }}
+          JRELEASER_GPG_PASSPHRASE: ${{ secrets.SIGN_KEY_PASS }}

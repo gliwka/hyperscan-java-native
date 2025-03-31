@@ -32,30 +32,6 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <javacpp.version>1.5.9</javacpp.version>
     </properties>
-    <profiles>
-        <profile>
-            <id>staging</id>
-            <activation>
-                <property>
-                    <name>env.STAGING</name>
-                    <value>true</value>
-                </property>
-            </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.sonatype.central</groupId>
-                        <artifactId>central-publishing-maven-plugin</artifactId>
-                        <version>0.7.0</version>
-                        <extensions>true</extensions>
-                        <configuration>
-                            <publishingServerId>central</publishingServerId>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
     <build>
         <extensions>
             <extension>
@@ -227,18 +203,6 @@
                         <id>attach-javadocs</id>
                         <goals>
                             <goal>jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.simplify4u.plugins</groupId>
-                <artifactId>sign-maven-plugin</artifactId>
-                <version>1.0.1</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>sign</goal>
                         </goals>
                     </execution>
                 </executions>
