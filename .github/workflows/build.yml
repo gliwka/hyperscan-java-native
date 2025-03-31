@@ -55,9 +55,7 @@ jobs:
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: build-result-${{ matrix.platform }}
-          path: |
-            target/*.jar
-            target/*.pom
+          path: target/staging-deploy
   publish:
     if: contains(github.ref, 'refs/tags/v')
     needs: build-native
@@ -74,5 +72,6 @@ jobs:
         env:
           JRELEASER_MAVENCENTRAL_USERNAME: ${{ secrets.CENTRAL_TOKEN_USERNAME }}
           JRELEASER_MAVENCENTRAL_PASSWORD: ${{ secrets.CENTRAL_TOKEN_PASSWORD }}
+          JRELEASER_GPG_PUBLIC_KEY: ${{ secrets.PUBLIC_KEY }}
           JRELEASER_GPG_SECRET_KEY: ${{ secrets.SIGN_KEY }}
           JRELEASER_GPG_PASSPHRASE: ${{ secrets.SIGN_KEY_PASS }}

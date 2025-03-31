@@ -1,4 +1,5 @@
 project:
+  version: 5.4.11-2.0.1-SNAPSHOT
   languages:
     java:
       version: "8"
