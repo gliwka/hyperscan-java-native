@@ -72,7 +72,7 @@ cd ..
 cd vectorscan
 
 # Patch correctness regression
-patch -p1 < ../patches/upstream-x86-correctness-regression.patch
+patch -p1 < ../../patches/upstream-x86-correctness-regression.patch
 
 # Disable flakey sqlite detection - only needed to build auxillary tools anyways.
 > cmake/sqlite3.cmake
