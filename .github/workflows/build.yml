@@ -52,7 +52,17 @@ jobs:
         uses: docker://ghcr.io/gliwka/centos7-toolchain:main@sha256:e6cf17223408bb4d1314be547d74b23d04bcf6480d2fe23822fb672a52775f76
         with:
           args: '"./build.sh"'
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
-          name: build-result
+          name: build-result-${{ matrix.platform }}
           path: target/
+  publish:
+    needs: build-native
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e
+        with:
+          path: target/
+          merge-multiple: true
+      - name: Display structure of downloaded files
+        run: ls -R target/
