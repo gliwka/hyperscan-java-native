@@ -101,11 +101,4 @@ esac
 
 cd ../..
 
-# only deploy with deploy command line param
-if [ $# -gt 0 ] && [ $1 = "deploy" ]
-then
-  mvn -B -Dorg.bytedeco.javacpp.platform=$DETECTED_PLATFORM --settings mvnsettings.xml deploy
-else
-  mvn -B -Dorg.bytedeco.javacpp.platform=$DETECTED_PLATFORM install
-fi
-
+mvn -B -Dorg.bytedeco.javacpp.platform=$DETECTED_PLATFORM package
