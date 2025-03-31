@@ -1,23 +1,8 @@
 name: build
 on: [push, pull_request]
-env:
-  OSSRH_JIRA_PASSWORD: ${{ secrets.OSSRH_JIRA_PASSWORD }}
 jobs:
-  create-staging-repo:
-    env:
-      STAGING: true
-    name: Create staging repository
-    runs-on: ubuntu-latest
-    outputs:
-      staging-repo: ${{ steps.create-repo.outputs.repo }}
-    steps:
-    - uses: actions/checkout@v2
-    - id: create-repo
-      if: startsWith(github.ref, 'refs/tags/v') == true
-      run: "mvn -B --settings mvnsettings.xml nexus-staging:rc-open -DserverId=ossrh -DnexusUrl=https://oss.sonatype.org/ -DstagingProfileId=72c1cc10566951 -DopenedRepositoryMessageFormat='\nrepo=%s' | grep 'repo=' >> $GITHUB_OUTPUT"
   build-native:
     name: Build native libs
-    needs: create-staging-repo
     runs-on: ${{ matrix.runner }}
     defaults:
       run:
@@ -45,7 +30,6 @@ jobs:
             shell: bash
             platform: linux-arm64
     env:
-      STAGING_REPO: ${{ needs.create-staging-repo.outputs.staging-repo }}
       DETECTED_PLATFORM: ${{ matrix.platform }}
       STAGING: ${{ startsWith(github.ref, 'refs/tags/v') }}
     steps:
