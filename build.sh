@@ -50,7 +50,7 @@ cross_platform_check_sha \
 tar -xvf vectorscan-$VERSION.tar.gz
 mv vectorscan-vectorscan-$VERSION vectorscan
 
-curl -L -o boost_1_74_0.tar.gz https://boostorg.jfrog.io/artifactory/main/release/1.74.0/source/boost_1_74_0.tar.gz
+curl -L -o boost_1_74_0.tar.gz https://archives.boost.io/release/1.74.0/source/boost_1_74_0.tar.gz
 cross_platform_check_sha \
   afff36d392885120bcac079148c177d1f6f7730ec3d47233aa51b0afa4db94a5 \
   boost_1_74_0.tar.gz
