@@ -68,10 +68,18 @@ jobs:
           echo "EOF" >> $GITHUB_ENV
           echo "SIGN_KEY_PASS=${{ secrets.SIGN_KEY_PASS }}" >> $GITHUB_ENV
       - name: Build native binaries
+        if: matrix.os == 'macos' && startsWith(github.ref, 'refs/tags/v') == true
         run: ./build.sh deploy
-        if: matrix.os == 'macos'
+      - name: Build native binaries
+        if: matrix.os == 'macos' && startsWith(github.ref, 'refs/tags/v') != true
+        run: ./build.sh
       - name: Build native binaries in centos container
-        if: matrix.os == 'linux'
+        if: matrix.os == 'linux' && startsWith(github.ref, 'refs/tags/v') == true
         uses: docker://ghcr.io/gliwka/centos7-toolchain:main@sha256:e6cf17223408bb4d1314be547d74b23d04bcf6480d2fe23822fb672a52775f76
         with:
           args: '"./build.sh deploy"'
+      - name: Build native binaries in centos container
+        if: matrix.os == 'linux' && startsWith(github.ref, 'refs/tags/v') != true
+        uses: docker://ghcr.io/gliwka/centos7-toolchain:main@sha256:e6cf17223408bb4d1314be547d74b23d04bcf6480d2fe23822fb672a52775f76
+        with:
+          args: '"./build.sh"'
