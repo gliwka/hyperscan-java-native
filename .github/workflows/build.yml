@@ -66,6 +66,8 @@ jobs:
         with:
           path: target/staging-deploy
           merge-multiple: true
+      - name: Merge multiple local repositories
+        run: timestamp=$(date +"%Y%m%d.%H%M%S"); find target/staging-deploy -type f | while read file; do newfile=$(echo "$file" | sed -E "s/[0-9]{8}\.[0-9]{6}/$timestamp/g"); [ "$file" != "$newfile" ] && mv "$file" "$newfile"; done; find target/staging-deploy -type f -name "*.md5" -o -name "*.sha1" -delete
       - uses: jreleaser/release-action@f69e545b05f149483cecb2fb81866247992694b8
         with:
           arguments: deploy
