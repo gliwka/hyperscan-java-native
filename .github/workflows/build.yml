@@ -22,11 +22,11 @@ jobs:
             platform: macosx-arm64
             jdkArch: aarch64
           - os: linux
-            runner: ubuntu-latest
+            runner: ubuntu-24.04
             shell: bash
             platform: linux-x86_64
           - os: linux
-            runner: buildjet-4vcpu-ubuntu-2204-arm
+            runner: ubuntu-24.04-arm
             shell: bash
             platform: linux-arm64
     env:
