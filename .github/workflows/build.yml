@@ -73,5 +73,5 @@ jobs:
           SIGN_KEY: ${{ secrets.SIGN_KEY }}
           SIGN_KEY_PASS: ${{ secrets.SIGN_KEY_PASS }}
           STAGING: true
-        run: mvn --settings mvnsettings.xml deploy
+        run: mvn --settings mvnsettings.xml sign:sign central-publishing:publish
       
