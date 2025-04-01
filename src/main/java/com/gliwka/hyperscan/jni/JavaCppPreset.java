@@ -34,7 +34,6 @@ import org.bytedeco.javacpp.tools.InfoMapper;
         inherit = javacpp.class,
         value = {
                 @Platform(
-                        define = "NO_JNI_DETACH_THREAD", //JNI callback on same thread
                         value = {"linux-x86_64", "linux-arm64", "macosx-x86_64", "macosx-arm64"},
                         compiler = "cpp11",
                         include = {"hs/hs_common.h", "hs/hs_compile.h", "hs/hs_runtime.h", "hs/hs.h"},
