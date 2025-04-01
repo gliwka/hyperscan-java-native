@@ -70,10 +70,16 @@ jobs:
         run: ./merge-artifacts.sh
       - uses: jreleaser/release-action@f69e545b05f149483cecb2fb81866247992694b8
         with:
-          arguments: deploy
+          arguments: deploy --debug
         env:
           JRELEASER_MAVENCENTRAL_USERNAME: ${{ secrets.CENTRAL_TOKEN_USERNAME }}
           JRELEASER_MAVENCENTRAL_PASSWORD: ${{ secrets.CENTRAL_TOKEN_PASSWORD }}
           JRELEASER_GPG_PUBLIC_KEY: ${{ secrets.PUBLIC_KEY }}
           JRELEASER_GPG_SECRET_KEY: ${{ secrets.SIGN_KEY }}
           JRELEASER_GPG_PASSPHRASE: ${{ secrets.SIGN_KEY_PASS }}
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: releaser
+          path: |
+            target/staging-deploy
+            out
