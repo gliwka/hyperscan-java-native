@@ -30,7 +30,7 @@
         <maven.compiler.target>1.8</maven.compiler.target>
         <maven.compiler.source>1.8</maven.compiler.source>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <javacpp.version>1.5.11</javacpp.version>
+        <javacpp.version>1.5.12</javacpp.version>
         <altDeploymentRepository>local::file:./target/staging-deploy</altDeploymentRepository>
     </properties>
     <build>
