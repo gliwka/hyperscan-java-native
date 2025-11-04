@@ -4,8 +4,8 @@
 set -xeu
 set -o pipefail
 
-VERSION="5.4.11"
-SHA256="905f76ad1fa9e4ae0eb28232cac98afdb96c479666202c5a4c27871fb30a2711"
+VERSION="5.4.12"
+SHA256="1ac4f3c038ac163973f107ac4423a6b246b181ffd97fdd371696b2517ec9b3ed"
 
 detect_platform() {
   # use os-maven-plugin to detect platform
@@ -43,19 +43,19 @@ mkdir -p cppbuild/bin
 mkdir -p cppbuild/include/hs
 cd cppbuild
 
-curl -L -o vectorscan-$VERSION.tar.gz https://github.com/VectorCamp/vectorscan/archive/refs/tags/vectorscan/5.4.11.tar.gz
+curl -L -o vectorscan-$VERSION.tar.gz https://github.com/VectorCamp/vectorscan/archive/refs/tags/vectorscan/$VERSION.tar.gz
 cross_platform_check_sha \
   $SHA256 \
   vectorscan-$VERSION.tar.gz
 tar -xvf vectorscan-$VERSION.tar.gz
 mv vectorscan-vectorscan-$VERSION vectorscan
 
-curl -L -o boost_1_74_0.tar.gz https://archives.boost.io/release/1.74.0/source/boost_1_74_0.tar.gz
+curl -L -o boost_1_89_0.tar.gz https://archives.boost.io/release/1.89.0/source/boost_1_89_0.tar.gz
 cross_platform_check_sha \
-  afff36d392885120bcac079148c177d1f6f7730ec3d47233aa51b0afa4db94a5 \
-  boost_1_74_0.tar.gz
-tar -zxf boost_1_74_0.tar.gz
-mv boost_1_74_0/boost vectorscan/include/boost
+  9de758db755e8330a01d995b0a24d09798048400ac25c03fc5ea9be364b13c93 \
+  boost_1_89_0.tar.gz
+tar -zxf boost_1_89_0.tar.gz
+mv boost_1_89_0/boost vectorscan/include/boost
 
 curl -L -o ragel-6.10.tar.gz https://www.colm.net/files/ragel/ragel-6.10.tar.gz
 cross_platform_check_sha \
@@ -71,28 +71,23 @@ cd ..
 
 cd vectorscan
 
-# Patch correctness regression
-patch -p1 < ../../patches/upstream-x86-correctness-regression.patch
-
 # Disable flakey sqlite detection - only needed to build auxillary tools anyways.
 > cmake/sqlite3.cmake
 
 case $DETECTED_PLATFORM in
 linux-x86_64)
   cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="$(pwd)/.." -DCMAKE_INSTALL_LIBDIR="lib" -DPCRE_SOURCE="." -DFAT_RUNTIME=on -DBUILD_SHARED_LIBS=on -DBUILD_AVX2=yes -DBUILD_AVX512=yes -DBUILD_AVX512VBMI=yes .
-  make -j $THREADS
-  make install/strip
+  make -j $THREADS all unit install/strip
+
   ;;
 linux-arm64)
-  CC="clang" CXX="clang++" cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="$(pwd)/.." -DCMAKE_INSTALL_LIBDIR="lib" -DPCRE_SOURCE="." -DFAT_RUNTIME=on -DBUILD_SHARED_LIBS=on .
-  make -j $THREADS
-  make install/strip
+  CC="clang" CXX="clang++" cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="$(pwd)/.." -DCMAKE_INSTALL_LIBDIR="lib" -DPCRE_SOURCE="." -DFAT_RUNTIME=on -DBUILD_SHARED_LIBS=on -DBUILD_SVE=on -DBUILD_SVE2=on .
+  make -j $THREADS all unit install/strip
   ;;
 macosx-x86_64|macosx-arm64)
   export MACOSX_DEPLOYMENT_TARGET=12
-  cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="$(pwd)/.." -DCMAKE_INSTALL_LIBDIR="lib" -DARCH_OPT_FLAGS='-Wno-error' -DPCRE_SOURCE="." -DBUILD_SHARED_LIBS=on .
-  make -j $THREADS
-  make install/strip
+  cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="$(pwd)/.." -DCMAKE_INSTALL_LIBDIR="lib" -DARCH_OPT_FLAGS='-Wno-error' -DPCRE_SOURCE="." -DBUILD_SHARED_LIBS=on . -DFAT_RUNTIME=off -DBUILD_BENCHMARKS=false
+  make -j $THREADS all unit install/strip
   ;;
 *)
   echo "Error: Arch \"$DETECTED_PLATFORM\" is not supported"

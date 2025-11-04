@@ -1,5 +1,5 @@
 project:
-  version: 5.4.11-2.0.2
+  version: 5.4.12-2.0.3
   languages:
     java:
       version: "8"
