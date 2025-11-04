@@ -1,5 +1,9 @@
 name: build
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - main
+  pull_request:
 jobs:
   build-native:
     name: Build native libs
@@ -12,12 +16,12 @@ jobs:
       matrix:
         include:
           - os: macos
-            runner: macos-13
+            runner: macos-14-large
             shell: bash
             platform: macosx-x86_64
             jdkArch: x64
           - os: macos
-            runner: macos-13-xlarge
+            runner: macos-14-xlarge
             shell: bash
             platform: macosx-arm64
             jdkArch: aarch64
@@ -43,7 +47,7 @@ jobs:
       - uses: maxim-lobanov/setup-xcode@60606e260d2fc5762a71e64e74b2174e8ea3c8bd
         if: matrix.os == 'macos'
         with:
-          xcode-version: 14.1
+          xcode-version: 16.2
       - name: Build native binaries
         if: matrix.os == 'macos'
         run: ./build.sh
