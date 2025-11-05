@@ -11,4 +11,4 @@ find target/staging-deploy -type f | while read file; do
 done
 
 # Delete hashsums, they will be recreated
-find target/staging-deploy -type f -name "*.md5" -o -name "*.sha1" -delete
+find target/staging-deploy -type f \( -name "*.md5" -o -name "*.sha1" \) -delete
