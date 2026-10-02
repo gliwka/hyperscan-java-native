@@ -4,8 +4,8 @@
 set -xeu
 set -o pipefail
 
-VERSION="5.4.12"
-SHA256="1ac4f3c038ac163973f107ac4423a6b246b181ffd97fdd371696b2517ec9b3ed"
+VERSION="5.4.13"
+SHA256="11bfcd2dde32d8a08d1a2eebb09294b12a3fa2be140078f8091b751fa1fabd89"
 
 detect_platform() {
   # use os-maven-plugin to detect platform
