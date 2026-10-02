@@ -58,6 +58,7 @@ cross_platform_check_sha \
   $SIMDE_SHA256 \
   simde-$SIMDE_COMMIT.tar.gz
 tar -xvf simde-$SIMDE_COMMIT.tar.gz
+rm -r vectorscan/simde
 mv simde-$SIMDE_COMMIT vectorscan/simde
 
 curl -L -o boost_1_89_0.tar.gz https://archives.boost.io/release/1.89.0/source/boost_1_89_0.tar.gz
