@@ -7,6 +7,9 @@ set -o pipefail
 VERSION="5.4.13"
 SHA256="11bfcd2dde32d8a08d1a2eebb09294b12a3fa2be140078f8091b751fa1fabd89"
 
+SIMDE_COMMIT="416091ebdb9e901b29d026633e73167d6353a0b0"
+SIMDE_SHA256="2362ee3d2a6160094b2663b102ab08b376b1ea0dbd8e3c79ee9cab81775c7ee1"
+
 detect_platform() {
   # use os-maven-plugin to detect platform
   local platform=$(mvn help:evaluate -Dexpression=os.detected.classifier -q -DforceStdout)
@@ -49,6 +52,13 @@ cross_platform_check_sha \
   vectorscan-$VERSION.tar.gz
 tar -xvf vectorscan-$VERSION.tar.gz
 mv vectorscan-vectorscan-$VERSION vectorscan
+
+curl -L -o simde-$SIMDE_COMMIT.tar.gz https://github.com/simd-everywhere/simde/archive/$SIMDE_COMMIT.tar.gz
+cross_platform_check_sha \
+  $SIMDE_SHA256 \
+  simde-$SIMDE_COMMIT.tar.gz
+tar -xvf simde-$SIMDE_COMMIT.tar.gz
+mv simde-$SIMDE_COMMIT vectorscan/simde
 
 curl -L -o boost_1_89_0.tar.gz https://archives.boost.io/release/1.89.0/source/boost_1_89_0.tar.gz
 cross_platform_check_sha \
